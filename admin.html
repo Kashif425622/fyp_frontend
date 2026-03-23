@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Portal</title>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  background:#0f172a;
+  color:white;
+  font-family:Segoe UI
+}
+.sidebar{
+  width:260px;
+  height:100vh;
+  background:linear-gradient(#1e3a8a,#2563eb)
+}
+.menu li{
+  list-style:none;
+  padding:12px;
+  margin:6px;
+  border-radius:8px;
+  cursor:pointer
+}
+.menu li:hover,.active{
+  background:rgba(255,255,255,.2)
+}
+.content{padding:30px}
+.card{
+  background:#020617;
+  border:1px solid #1e293b
+}
+label{color:#94a3b8}
+.progress{height:10px}
+</style>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script>
+const e = React.createElement;
+
+/* ===== ADMIN LOGIN ===== */
+function Login({onLogin}){
+  return e("div",{className:"container col-md-4 mt-5"},
+    e("div",{className:"card p-4"},
+      e("h3",{className:"text-info text-center"},"🛡️ Admin Login"),
+      e("input",{className:"form-control my-2",placeholder:"Admin ID"}),
+      e("input",{className:"form-control my-2",type:"password",placeholder:"Password"}),
+      e("button",{className:"btn btn-info w-100 mt-2",onClick:onLogin},"Login")
+    )
+  );
+}
+
+/* ===== DASHBOARD ===== */
+function Dashboard(){
+  return e("div",null,
+    e("h3",{className:"text-info mb-3"},"📊 Admin Dashboard"),
+    e("div",{className:"row"},
+      stat("Total Students","1240","bg-info"),
+      stat("Average CGPA","8.2","bg-success"),
+      stat("Pending Fees","₹12.6L","bg-warning")
+    )
+  );
+}
+
+/* ===== STUDENT MANAGEMENT ===== */
+function Students(){
+  return cardPage("👥 Student Profiles",
+    e("table",{className:"table table-dark"},
+      e("thead",null,
+        e("tr",null,["Roll No","Name","Year","Action"].map(h=>e("th",null,h)))
+      ),
+      e("tbody",null,
+        [["21CSE045","Rahul Sharma","3rd"],
+         ["21ECE022","Ananya Verma","2nd"]]
+        .map((s,i)=>
+          e("tr",{key:i},
+            e("td",null,s[0]),
+            e("td",null,s[1]),
+            e("td",null,s[2]),
+            e("td",null,
+              e("button",{className:"btn btn-sm btn-info me-2"},"Edit"),
+              e("button",{className:"btn btn-sm btn-danger"},"Delete")
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+/* ===== ATTENDANCE CONTROL ===== */
+function Attendance(){
+  return cardPage("📝 Attendance Control",
+    ["DSA","OS","DBMS","CN"].map((s,i)=>
+      e("div",{key:i,className:"mb-3"},
+        e("strong",null,s),
+        e("input",{type:"range",className:"form-range",defaultValue:80})
+      )
+    )
+  );
+}
+
+/* ===== MARKS CONTROL ===== */
+function Marks(){
+  return cardPage("📈 Marks & Grades",
+    ["DSA","OS","DBMS","CN"].map((s,i)=>
+      e("div",{key:i,className:"mb-3"},
+        e("strong",null,s),
+        e("input",{className:"form-control mt-1",placeholder:"Enter Marks"})
+      )
+    )
+  );
+}
+
+/* ===== FEES ===== */
+function Fees(){
+  return cardPage("💰 Fee Management",
+    e("p",null,"• Update payment status"),
+    e("p",null,"• Send pending reminders"),
+    e("p",null,"• Export fee reports")
+  );
+}
+
+/* ===== COURSES ===== */
+function Courses(){
+  return cardPage("📚 Course Control",
+    e("input",{className:"form-control mb-3",placeholder:"Add New Course"}),
+    e("button",{className:"btn btn-info w-100"},"Add Course")
+  );
+}
+
+/* ===== TRANSCRIPTS ===== */
+function Transcript(){
+  return cardPage("📄 Transcript Generator",
+    e("p",null,"Generate CGPA & Download PDF"),
+    e("button",{className:"btn btn-outline-info"},"Generate Transcript")
+  );
+}
+
+/* ===== SETTINGS ===== */
+function Settings({onLogout}){
+  return cardPage("⚙️ Settings",
+    e("button",{className:"btn btn-danger w-100",onClick:onLogout},"Logout")
+  );
+}
+
+/* ===== HELPERS ===== */
+const stat=(t,v,c)=>e("div",{className:"col-md-4 mb-3"},
+  e("div",{className:"card p-3 text-center"},
+    e("h6",{className:"text-info"},t),
+    e("h2",{className:c},v)
+  )
+);
+const cardPage=(t,...c)=>e("div",{className:"card p-4"},
+  e("h4",{className:"text-info mb-3"},t),c
+);
+
+/* ===== APP ===== */
+function App(){
+  const [logged,setLogged]=React.useState(false);
+  const [page,setPage]=React.useState("dashboard");
+
+  if(!logged) return e(Login,{onLogin:()=>setLogged(true)});
+
+  const pages={
+    dashboard:e(Dashboard),
+    students:e(Students),
+    attendance:e(Attendance),
+    marks:e(Marks),
+    fees:e(Fees),
+    courses:e(Courses),
+    transcript:e(Transcript),
+    settings:e(Settings,{onLogout:()=>setLogged(false)})
+  };
+
+  return e("div",{className:"d-flex"},
+    e("div",{className:"sidebar p-3"},
+      e("h4",{className:"text-center"},"Admin Portal"),
+      e("ul",{className:"menu p-0"},
+        Object.keys(pages).map(p=>
+          e("li",{key:p,onClick:()=>setPage(p),className:page===p?"active":""},p.toUpperCase())
+        )
+      )
+    ),
+    e("div",{className:"content flex-fill"},pages[page])
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+</script>
+</body>
+</html>

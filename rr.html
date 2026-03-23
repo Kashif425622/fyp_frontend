@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Portal</title>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{margin:0;background:#0f172a;font-family:Segoe UI;color:white}
+.sidebar{width:260px;height:100vh;background:linear-gradient(#2563eb,#38bdf8)}
+.menu li{list-style:none;padding:12px;margin:6px;border-radius:8px;cursor:pointer}
+.menu li:hover,.active{background:rgba(255,255,255,.2)}
+.content{padding:30px}
+.card{background:#020617;border:1px solid #1e293b}
+.profile-img{width:120px;border-radius:50%;border:3px solid #38bdf8}
+label{color:#94a3b8}
+.small{color:#94a3b8;font-size:14px}
+</style>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script>
+const e = React.createElement;
+
+/* LOGIN */
+function Login({onLogin}){
+  return e("div",{className:"container col-md-4 mt-5"},
+    e("div",{className:"card p-4"},
+      e("h3",{className:"text-info text-center"},"🎓 Student Login"),
+      e("input",{className:"form-control my-2",placeholder:"Roll Number"}),
+      e("input",{className:"form-control my-2",type:"password",placeholder:"Password"}),
+      e("button",{className:"btn btn-info w-100 mt-2",onClick:onLogin},"Login")
+    )
+  );
+}
+
+/* DASHBOARD */
+function Dashboard(){
+  return e("div",null,
+    e("h3",{className:"text-info mb-3"},"📊 Dashboard"),
+
+    e("div",{className:"row"},
+      stat("Attendance","85%","bg-success"),
+      stat("CGPA","8.4","bg-info"),
+      stat("Rank","Top 10%","bg-warning")
+    ),
+
+    e("div",{className:"row mt-4"},
+      panel("🔔 Notifications",[
+        "DBMS Assignment due tomorrow",
+        "Semester fee pending",
+        "Midterm exams from 10 Oct"
+      ]),
+      panel("⚡ Quick Actions",[
+        e("button",{className:"btn btn-outline-info w-100 mb-2",onClick:()=>alert("ID Card Downloaded")},"Download ID"),
+        e("button",{className:"btn btn-outline-success w-100 mb-2",onClick:()=>alert("Fee Payment Gateway")},"Pay Fees"),
+        e("button",{className:"btn btn-outline-warning w-100",onClick:()=>alert("Results Opened")},"View Results")
+      ])
+    )
+  );
+}
+
+/* PROFILE */
+function Profile(){
+  return e("div",{className:"card p-4"},
+    e("div",{className:"text-center"},
+      e("img",{src:"https://i.pravatar.cc/150?img=12",className:"profile-img"}),
+      e("h3",{className:"text-info mt-2"},"Rahul Sharma"),
+      e("p",null,"B.Tech Computer Science")
+    ),
+    e("hr"),
+    info("Roll No","21CSE045"),
+    info("Email","rahul@college.edu"),
+    info("Phone","+91 9876543210"),
+    info("Address","New Delhi")
+  );
+}
+
+/* ATTENDANCE */
+function Attendance(){
+  return cardPage("📝 Attendance",
+    table(["Subject","Attendance"],[
+      ["DSA","90%"],["OS","82%"],["DBMS","88%"],["CN","80%"]
+    ])
+  );
+}
+
+/* MARKS */
+function Marks(){
+  return cardPage("📈 Marks",
+    table(["Subject","Marks","Grade"],[
+      ["DSA",85,"A"],["OS",78,"B+"],["DBMS",88,"A"],["CN",75,"B"]
+    ])
+  );
+}
+
+/* FEES */
+function FeeHistory(){
+  return cardPage("💰 Fee History",
+    table(["Semester","Amount","Status"],[
+      ["Sem 1","₹45,000","Paid"],
+      ["Sem 2","₹45,000","Paid"],
+      ["Sem 3","₹48,000","Pending"]
+    ])
+  );
+}
+
+/* COURSES */
+function Courses(){
+  return cardPage("📚 Courses",
+    e("ul",null,
+      ["DSA","OS","DBMS","CN","AI","Maths"]
+      .map((c,i)=>e("li",{key:i},c))
+    )
+  );
+}
+
+/* TRANSCRIPT */
+function Transcript(){
+  return cardPage("📄 Transcript",
+    e("div",null,
+      table(["Semester","SGPA"],[
+        ["Sem 1","8.1"],["Sem 2","8.4"],["Sem 3","8.7"]
+      ]),
+      e("button",{className:"btn btn-outline-info mt-3",onClick:()=>alert("Transcript Downloaded")},"Download PDF")
+    )
+  );
+}
+
+/* SETTINGS */
+function Settings({onLogout}){
+  return cardPage("⚙️ Settings",
+    e("div",null,
+      e("button",{className:"btn btn-warning w-100 mb-2"},"Change Password"),
+      e("button",{className:"btn btn-danger w-100",onClick:onLogout},"Logout")
+    )
+  );
+}
+
+/* HELPERS */
+const stat=(t,v,c)=>e("div",{className:"col-md-4"},
+  e("div",{className:"card p-3 text-center"},
+    e("h6",{className:"text-info"},t),
+    e("h2",{className:c},v)
+  )
+);
+const panel=(t,items)=>e("div",{className:"col-md-6"},
+  e("div",{className:"card p-3"},
+    e("h5",{className:"text-info"},t),
+    Array.isArray(items)
+      ? items.map((i,k)=>typeof i==="string"?e("p",{key:k},i):e("div",{key:k},i))
+      : items
+  )
+);
+const info=(l,v)=>e("p",null,e("label",null,l),": ",v);
+const cardPage=(t,c)=>e("div",{className:"card p-4"},
+  e("h4",{className:"text-info mb-3"},t),c
+);
+const table=(h,d)=>e("table",{className:"table table-dark"},
+  e("thead",null,e("tr",null,h.map((x,i)=>e("th",{key:i},x)))),
+  e("tbody",null,d.map((r,i)=>e("tr",{key:i},r.map((c,j)=>e("td",{key:j},c)))))
+);
+
+/* APP */
+function App(){
+  const [logged,setLogged]=React.useState(false);
+  const [page,setPage]=React.useState("dashboard");
+
+  if(!logged) return e(Login,{onLogin:()=>setLogged(true)});
+
+  const pages={
+    dashboard:e(Dashboard),
+    profile:e(Profile),
+    attendance:e(Attendance),
+    marks:e(Marks),
+    feehistory:e(FeeHistory),
+    courses:e(Courses),
+    transcript:e(Transcript),
+    settings:e(Settings,{onLogout:()=>setLogged(false)})
+  };
+
+  return e("div",{className:"d-flex"},
+    e("div",{className:"sidebar p-3"},
+      e("h4",{className:"text-center"},"Student Portal"),
+      e("ul",{className:"menu p-0"},
+        Object.keys(pages).map(p=>
+          e("li",{key:p,onClick:()=>setPage(p),className:page===p?"active":""},p.toUpperCase())
+        )
+      )
+    ),
+    e("div",{className:"content flex-fill"},pages[page])
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+</script>
+</body>
+</html>

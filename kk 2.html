@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>University Portal</title>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{margin:0;background:#0f172a;font-family:Segoe UI;color:white}
+.sidebar{width:260px;height:100vh;background:linear-gradient(#2563eb,#38bdf8)}
+.menu li{list-style:none;padding:12px;margin:6px;border-radius:8px;cursor:pointer}
+.menu li:hover,.active{background:rgba(255,255,255,.2)}
+.content{padding:30px}
+.card{background:#020617;border:1px solid #1e293b}
+.profile-img{width:120px;border-radius:50%;border:3px solid #38bdf8}
+label{color:#94a3b8}
+.course-card{background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:12px;padding:20px;text-align:center;font-weight:bold}
+</style>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script>
+const e=React.createElement;
+
+/* LOGIN */
+function Login({setRole}){
+  const [u,setU]=React.useState("");
+  const [p,setP]=React.useState("");
+  const [r,setR]=React.useState("student");
+
+  function go(){
+    if(r==="admin" && u==="admin" && p==="admin123") setRole("admin");
+    else if(r==="student") setRole("student");
+    else alert("Wrong login");
+  }
+
+  return e("div",{className:"container col-md-4 mt-5"},
+    e("div",{className:"card p-4"},
+      e("h3",{className:"text-info text-center"},"University Login"),
+      e("select",{className:"form-control my-2",onChange:x=>setR(x.target.value)},
+        e("option",{value:"student"},"Student"),
+        e("option",{value:"admin"},"Admin")
+      ),
+      e("input",{className:"form-control my-2",placeholder:"Username / Roll",onChange:x=>setU(x.target.value)}),
+      e("input",{className:"form-control my-2",type:"password",placeholder:"Password",onChange:x=>setP(x.target.value)}),
+      e("button",{className:"btn btn-info w-100",onClick:go},"Login")
+    )
+  );
+}
+
+/* ADMIN DASHBOARD */
+function Admin({logout}){
+  return e("div",{className:"d-flex"},
+    e("div",{className:"sidebar p-3"},
+      e("h4",{className:"text-center"},"Admin"),
+      e("ul",{className:"menu p-0"},
+        ["Dashboard","Students","Courses","Logout"].map(m=>
+          e("li",{key:m,onClick:()=>m==="Logout"?logout():null},m)
+        )
+      )
+    ),
+    e("div",{className:"content flex-fill"},
+      e("h2",{className:"text-info"},"Admin Dashboard"),
+      e("p",null,"Manage students, courses, attendance, fees")
+    )
+  );
+}
+
+/* STUDENT DASHBOARD (SIMPLE) */
+function Student({logout}){
+  return e("div",{className:"d-flex"},
+    e("div",{className:"sidebar p-3"},
+      e("h4",{className:"text-center"},"Student"),
+      e("ul",{className:"menu p-0"},
+        ["Dashboard","Profile","Courses","Logout"].map(m=>
+          e("li",{key:m,onClick:()=>m==="Logout"?logout():null},m)
+        )
+      )
+    ),
+    e("div",{className:"content flex-fill"},
+      e("h2",{className:"text-info"},"Student Dashboard"),
+      e("p",null,"View profile, attendance, marks, fees")
+    )
+  );
+}
+
+/* APP */
+function App(){
+  const [role,setRole]=React.useState(null);
+  if(!role) return e(Login,{setRole});
+  if(role==="admin") return e(Admin,{logout:()=>setRole(null)});
+  return e(Student,{logout:()=>setRole(null)});
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+</script>
+</body>
+</html>

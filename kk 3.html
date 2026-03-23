@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Portal</title>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  background:#0f172a;
+  font-family:Segoe UI;
+  color:white
+}
+.sidebar{
+  width:260px;
+  height:100vh;
+  background:linear-gradient(#2563eb,#38bdf8)
+}
+.menu li{
+  list-style:none;
+  padding:12px;
+  margin:6px;
+  border-radius:8px;
+  cursor:pointer
+}
+.menu li:hover,.active{
+  background:rgba(255,255,255,.2)
+}
+.content{padding:30px}
+.card{
+  background:#020617;
+  border:1px solid #1e293b
+}
+.profile-img{
+  width:120px;
+  border-radius:50%;
+  border:3px solid #38bdf8
+}
+label{color:#94a3b8}
+
+/* EXISTING */
+.badge-paid{background:#22c55e}
+.badge-pending{background:#facc15;color:black}
+.course-card{
+  background:linear-gradient(135deg,#1e3a8a,#2563eb);
+  border-radius:12px;
+  padding:20px;
+  text-align:center;
+  font-weight:bold;
+  transition:.3s;
+}
+.course-card:hover{
+  transform:scale(1.05);
+  background:linear-gradient(135deg,#2563eb,#38bdf8);
+}
+
+/* ===== ONLY 3 TAB COLORS ===== */
+.att-card{
+  background:linear-gradient(135deg,#064e3b,#16a34a);
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:15px;
+}
+.marks-card{
+  background:linear-gradient(135deg,#1e3a8a,#2563eb);
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:15px;
+}
+.trans-card{
+  background:linear-gradient(135deg,#4c1d95,#7c3aed);
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:15px;
+}
+.grade{
+  padding:4px 10px;
+  border-radius:20px;
+  font-weight:bold;
+}
+.grade-A{background:#22c55e}
+.grade-B{background:#eab308;color:black}
+.progress{height:10px}
+</style>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script>
+const e = React.createElement;
+
+/* LOGIN */
+function Login({onLogin}){
+  return e("div",{className:"container col-md-4 mt-5"},
+    e("div",{className:"card p-4"},
+      e("h3",{className:"text-info text-center"},"🎓 Student Login"),
+      e("input",{className:"form-control my-2",placeholder:"Roll Number"}),
+      e("input",{className:"form-control my-2",type:"password",placeholder:"Password"}),
+      e("button",{className:"btn btn-info w-100 mt-2",onClick:onLogin},"Login")
+    )
+  );
+}
+
+/* DASHBOARD (MORE DETAILS) */
+function Dashboard(){
+  return e("div",null,
+    e("h3",{className:"text-info mb-3"},"📊 Dashboard"),
+
+    e("div",{className:"row"},
+      stat("Attendance","85%","bg-success"),
+      stat("CGPA","8.4","bg-info"),
+      stat("Rank","Top 10%","bg-warning")
+    ),
+
+    e("div",{className:"row mt-4"},
+      stat("Fee Status","Pending","bg-danger"),
+      stat("Total Subjects","6","bg-primary"),
+      stat("Next Exam","10 Oct","bg-secondary")
+    )
+  );
+}
+
+/* PROFILE (PERSONAL DATA ADDED) */
+function Profile(){
+  return e("div",{className:"card p-4"},
+    e("div",{className:"text-center"},
+      e("img",{src:"https://i.pravatar.cc/150?img=12",className:"profile-img"}),
+      e("h3",{className:"text-info mt-2"},"Rahul Sharma"),
+      e("p",null,"B.Tech Computer Science")
+    ),
+    e("hr"),
+    info("Roll No","21CSE045"),
+    info("Email","rahul@college.edu"),
+    info("Phone","+91 9876543210"),
+    info("Date of Birth","12 Aug 2003"),
+    info("Gender","Male"),
+    info("Blood Group","B+"),
+    info("Year","3rd Year"),
+    info("College","ABC Institute of Technology"),
+    info("Address","New Delhi, India")
+  );
+}
+
+/* ===== ATTENDANCE (ENHANCED) ===== */
+function Attendance(){
+  const data=[["DSA",90],["OS",82],["DBMS",88],["CN",80]];
+  return cardPage("📝 Attendance",
+    data.map((s,i)=>
+      e("div",{className:"att-card",key:i},
+        e("div",{className:"d-flex justify-content-between"},
+          e("strong",null,s[0]),
+          e("strong",null,s[1]+"%")
+        ),
+        e("div",{className:"progress mt-2"},
+          e("div",{className:"progress-bar bg-success",style:{width:s[1]+"%"}})
+        )
+      )
+    )
+  );
+}
+
+/* ===== MARKS (ENHANCED) ===== */
+function Marks(){
+  const data=[["DSA",85,"A"],["OS",78,"B"],["DBMS",88,"A"],["CN",75,"B"]];
+  return cardPage("📈 Marks",
+    data.map((m,i)=>
+      e("div",{className:"marks-card",key:i},
+        e("div",{className:"d-flex justify-content-between"},
+          e("strong",null,m[0]+" – "+m[1]),
+          e("span",{className:"grade "+(m[2]==="A"?"grade-A":"grade-B")},m[2])
+        )
+      )
+    )
+  );
+}
+
+/* ===== FEE HISTORY (UNCHANGED) ===== */
+function FeeHistory(){
+  return cardPage("💰 Fee History",
+    e("table",{className:"table table-dark"},
+      e("thead",null,
+        e("tr",null,["Semester","Amount","Status"].map((h,i)=>e("th",{key:i},h)))
+      ),
+      e("tbody",null,
+        [["Sem 1","₹45,000","Paid"],["Sem 2","₹45,000","Paid"],["Sem 3","₹48,000","Pending"]]
+        .map((r,i)=>
+          e("tr",{key:i},
+            e("td",null,r[0]),
+            e("td",null,r[1]),
+            e("td",null,
+              e("span",{className:"badge "+(r[2]==="Paid"?"badge-paid":"badge-pending")},r[2])
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+/* ===== COURSES (UNCHANGED) ===== */
+function Courses(){
+  return cardPage("📚 Courses",
+    e("div",{className:"row"},
+      ["DSA","OS","DBMS","CN","AI","Maths"].map((c,i)=>
+        e("div",{className:"col-md-4 mb-3",key:i},
+          e("div",{className:"course-card"},c)
+        )
+      )
+    )
+  );
+}
+
+/* ===== TRANSCRIPT (ENHANCED) ===== */
+function Transcript(){
+  const data=[["Sem 1",8.1],["Sem 2",8.4],["Sem 3",8.7]];
+  return cardPage("📄 Transcript",
+    e("div",null,
+      data.map((t,i)=>
+        e("div",{className:"trans-card",key:i},
+          e("div",{className:"d-flex justify-content-between"},
+            e("strong",null,t[0]),
+            e("strong",null,t[1])
+          ),
+          e("div",{className:"progress mt-2"},
+            e("div",{className:"progress-bar bg-info",style:{width:(t[1]*10)+"%"}})
+          )
+        )
+      ),
+      e("button",{className:"btn btn-outline-info mt-3"},"Download PDF")
+    )
+  );
+}
+
+/* SETTINGS */
+function Settings({onLogout}){
+  return cardPage("⚙️ Settings",
+    e("button",{className:"btn btn-danger w-100",onClick:onLogout},"Logout")
+  );
+}
+
+/* HELPERS */
+const stat=(t,v,c)=>e("div",{className:"col-md-4 mb-3"},
+  e("div",{className:"card p-3 text-center"},
+    e("h6",{className:"text-info"},t),
+    e("h2",{className:c},v)
+  )
+);
+const info=(l,v)=>e("p",null,e("label",null,l),": ",v);
+const cardPage=(t,c)=>e("div",{className:"card p-4"},
+  e("h4",{className:"text-info mb-3"},t),c
+);
+
+/* APP */
+function App(){
+  const [logged,setLogged]=React.useState(false);
+  const [page,setPage]=React.useState("dashboard");
+
+  if(!logged) return e(Login,{onLogin:()=>setLogged(true)});
+
+  const pages={
+    dashboard:e(Dashboard),
+    profile:e(Profile),
+    attendance:e(Attendance),
+    marks:e(Marks),
+    feehistory:e(FeeHistory),
+    courses:e(Courses),
+    transcript:e(Transcript),
+    settings:e(Settings,{onLogout:()=>setLogged(false)})
+  };
+
+  return e("div",{className:"d-flex"},
+    e("div",{className:"sidebar p-3"},
+      e("h4",{className:"text-center"},"Student Portal"),
+      e("ul",{className:"menu p-0"},
+        Object.keys(pages).map(p=>
+          e("li",{key:p,onClick:()=>setPage(p),className:page===p?"active":""},p.toUpperCase())
+        )
+      )
+    ),
+    e("div",{className:"content flex-fill"},pages[page])
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+</script>
+</body>
+</html>
+

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>University Portal</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Bootstrap CSS (optional for table styling) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-100">
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+/* ================= LOGIN ================= */
+function Login({ onLogin, isAdmin=false }) {
+  function handleSubmit(e) {
+    e.preventDefault();
+    onLogin();
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-700 to-purple-700">
+      <form onSubmit={handleSubmit} className="bg-white p-10 rounded-xl shadow-2xl w-96">
+        <h2 className="text-3xl font-bold text-center mb-6 text-blue-700">
+          {isAdmin ? "Admin Login" : "Student Login"}
+        </h2>
+
+        <input className="w-full p-3 border rounded mb-4" placeholder="Email" type="email"/>
+        <input className="w-full p-3 border rounded mb-6" placeholder="Password" type="password"/>
+
+        <button className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700">
+          Login
+        </button>
+      </form>
+    </div>
+  );
+}
+
+/* ================= SIDEBAR ================= */
+function Sidebar({ setTab, logout, tabs }) {
+  return (
+    <div className="w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white min-h-screen p-4">
+      <h2 className="text-2xl font-bold mb-6 text-center">🎓 Portal</h2>
+
+      {tabs.map(tab => (
+        <button key={tab}
+          onClick={() => setTab(tab)}
+          className="w-full text-left px-4 py-3 rounded hover:bg-blue-600 mb-2">
+          {tab}
+        </button>
+      ))}
+
+      <button onClick={logout}
+        className="mt-6 w-full bg-red-600 py-2 rounded hover:bg-red-700">
+        Logout
+      </button>
+    </div>
+  );
+}
+
+/* ================= CONTENT ================= */
+function Content({ tab, isAdmin=false }) {
+  const [profilePic, setProfilePic] = useState("https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = () => setProfilePic(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  /* Dummy data */
+  const grades = [
+    { course: "Data Structures", grade: "A", credits: 4 },
+    { course: "Operating Systems", grade: "B+", credits: 4 },
+    { course: "DBMS", grade: "A-", credits: 3 },
+    { course: "Web Development", grade: "A", credits: 3 },
+  ];
+
+  const fees = [
+    { semester: "1st Sem", total: "₹50,000", paid: "₹50,000", pending: "₹0" },
+    { semester: "2nd Sem", total: "₹50,000", paid: "₹25,000", pending: "₹25,000" },
+  ];
+
+  const libraryBooks = [
+    { title: "Clean Code", due: "20 Feb", status: "Issued" },
+    { title: "OS Concepts", due: "20 Feb", status: "Issued" },
+    { title: "Algorithms", due: "Returned", status: "Returned" },
+  ];
+
+  return (
+    <div className="flex-1 p-8 bg-gray-50 overflow-y-auto">
+
+      {/* DASHBOARD */}
+      {tab === "Dashboard" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">{isAdmin ? "Admin Dashboard" : "Student Dashboard"}</h1>
+          {!isAdmin && (
+            <div className="grid grid-cols-4 gap-6 mb-8">
+              <Card title="Attendance" value="87%" color="green" />
+              <Card title="CGPA" value="8.6" color="blue" />
+              <Card title="Pending Fees" value="₹25,000" color="red" />
+              <Card title="Issued Books" value="2" color="purple" />
+            </div>
+          )}
+          <img src={isAdmin ? "https://images.unsplash.com/photo-1581093588401-ecf70eb9c147" : "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f"}
+               className="rounded-xl shadow-lg w-full h-64 object-cover"/>
+        </>
+      )}
+
+      {/* PROFILE */}
+      {!isAdmin && tab === "Profile" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-purple-700">Student Profile</h1>
+          <div className="bg-gradient-to-r from-blue-100 to-purple-100 p-8 rounded-2xl shadow-xl">
+            <div className="flex gap-10">
+              <div className="text-center">
+                <img src={profilePic} className="w-48 h-48 rounded-full border-4 border-purple-500 shadow-lg object-cover"/>
+                <label className="block mt-4 bg-purple-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-purple-700">
+                  Upload Photo
+                  <input type="file" className="hidden" onChange={handleImageUpload}/>
+                </label>
+              </div>
+              <div className="grid grid-cols-2 gap-6 text-lg w-full">
+                <Info label="Full Name" value="John Doe" />
+                <Info label="Roll No" value="UNI2025CS01" />
+                <Info label="Department" value="Computer Science Engineering" />
+                <Info label="Year" value="3rd Year" />
+                <Info label="DOB" value="12 August 2004" />
+                <Info label="Gender" value="Male" />
+                <Info label="Email" value="john@university.edu" />
+                <Info label="Phone" value="+91 9876543210" />
+                <Info label="Address" value="New Delhi, India" />
+                <Info label="Blood Group" value="B+" />
+                <Info label="Admission Year" value="2023" />
+                <Info label="Status" value="Active" />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* COURSES */}
+      {!isAdmin && tab === "Courses" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">Enrolled Courses</h1>
+          <table className="table table-striped table-hover rounded shadow">
+            <thead className="table-dark">
+              <tr>
+                <th>Course</th>
+                <th>Faculty</th>
+                <th>Credits</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Data Structures","Dr. Sharma",4,"Ongoing"],
+                ["Operating Systems","Dr. Khan",4,"Ongoing"],
+                ["DBMS","Dr. Patel",3,"Completed"],
+                ["Web Development","Dr. Roy",3,"Ongoing"]
+              ].map((c,i)=>(
+                <tr key={i}>
+                  {c.map((item,j)=><td key={j}>{item}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {/* ATTENDANCE */}
+      {!isAdmin && tab === "Attendance" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">Attendance Record</h1>
+          <Progress label="Data Structures" value="90%" />
+          <Progress label="Operating Systems" value="85%" />
+          <Progress label="DBMS" value="92%" />
+          <Progress label="Web Development" value="80%" />
+        </>
+      )}
+
+      {/* GRADES */}
+      {!isAdmin && tab === "Grades" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">Academic Grades</h1>
+          <table className="table table-bordered shadow rounded">
+            <thead className="table-dark">
+              <tr>
+                <th>Course</th>
+                <th>Grade</th>
+                <th>Credits</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {grades.map((g,i)=>(
+                <tr key={i}>
+                  <td>{g.course}</td>
+                  <td>{g.grade}</td>
+                  <td>{g.credits}</td>
+                  <td>{g.grade==="A"?"Excellent":g.grade==="B+"?"Good":"Satisfactory"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {/* FEES */}
+      {!isAdmin && tab === "Fees" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">Fees Details</h1>
+          <table className="table table-bordered shadow rounded">
+            <thead className="table-dark">
+              <tr>
+                <th>Semester</th>
+                <th>Total Fees</th>
+                <th>Paid</th>
+                <th>Pending</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fees.map((f,i)=>(
+                <tr key={i}>
+                  <td>{f.semester}</td>
+                  <td>{f.total}</td>
+                  <td>{f.paid}</td>
+                  <td className="text-red-600 font-bold">{f.pending}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {/* LIBRARY */}
+      {!isAdmin && tab === "Library" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">Library Records</h1>
+          <table className="table table-striped table-hover shadow rounded">
+            <thead className="table-dark">
+              <tr>
+                <th>Book</th>
+                <th>Due Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {libraryBooks.map((b,i)=>(
+                <tr key={i}>
+                  <td>{b.title}</td>
+                  <td>{b.due}</td>
+                  <td className={b.status==="Issued"?"text-orange-600":"text-green-600"}>{b.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {/* SETTINGS */}
+      {!isAdmin && tab === "Settings" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">Settings</h1>
+          <div className="bg-white p-6 rounded shadow space-y-4">
+            <button className="bg-blue-600 text-white px-6 py-2 rounded">Change Password</button>
+            <button className="bg-green-600 text-white px-6 py-2 rounded">Update Profile</button>
+            <button className="bg-gray-700 text-white px-6 py-2 rounded">Notifications</button>
+          </div>
+        </>
+      )}
+
+      {/* ADMIN SPECIFIC TABS */}
+      {isAdmin && tab === "Students" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">Student Management</h1>
+          <p>Admin can view, edit, or delete student records here.</p>
+        </>
+      )}
+
+      {isAdmin && tab === "Faculty" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">Faculty Management</h1>
+          <p>Admin can manage faculty accounts here.</p>
+        </>
+      )}
+
+      {isAdmin && tab === "CoursesAdmin" && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-blue-700">Courses Management</h1>
+          <p>Admin can add/edit courses and assign faculty.</p>
+        </>
+      )}
+
+    </div>
+  );
+}
+
+/* SMALL COMPONENTS */
+const Card = ({title,value,color}) => (
+  <div className={`bg-${color}-100 p-6 rounded-xl shadow text-center`}>
+    <h3 className="text-lg">{title}</h3>
+    <p className={`text-3xl font-bold text-${color}-700`}>{value}</p>
+  </div>
+);
+
+const Progress = ({label,value}) => (
+  <div className="mb-4">
+    <p className="mb-1">{label} ({value})</p>
+    <div className="w-full bg-gray-300 rounded">
+      <div className="bg-blue-600 h-4 rounded" style={{width:value}}></div>
+    </div>
+  </div>
+);
+
+const Info = ({label,value}) => (
+  <div className="bg-white p-4 rounded-lg shadow">
+    <p className="text-gray-500 text-sm">{label}</p>
+    <p className="font-semibold text-gray-800">{value}</p>
+  </div>
+);
+
+/* ================= DASHBOARD ================= */
+function Dashboard({ logout, isAdmin=false }) {
+  const studentTabs = ["Dashboard","Profile","Courses","Attendance","Grades","Fees","Library","Settings"];
+  const adminTabs = ["Dashboard","Students","Faculty","CoursesAdmin","Settings"];
+  const tabs = isAdmin ? adminTabs : studentTabs;
+
+  const [tab, setTab] = useState("Dashboard");
+  return (
+    <div className="flex h-screen">
+      <Sidebar setTab={setTab} logout={logout} tabs={tabs} />
+      <Content tab={tab} isAdmin={isAdmin} />
+    </div>
+  );
+}
+
+/* ================= APP ================= */
+function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const handleLogin = () => {
+    // For demo: toggle admin based on checkbox or email
+    const adminLogin = window.confirm("Login as Admin?");
+    setIsAdmin(adminLogin);
+    setLoggedIn(true);
+  };
+
+  return loggedIn ? 
+    <Dashboard logout={()=>setLoggedIn(false)} isAdmin={isAdmin} /> : 
+    <Login onLogin={handleLogin} isAdmin={isAdmin} />;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
